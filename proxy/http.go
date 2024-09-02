@@ -8,11 +8,11 @@ import (
 )
 
 type HttpData struct {
-	ReqBody   *bytes.Buffer
-	ResBody   *bytes.Buffer
-	ReqHeader map[string][]string
-	ResHeader map[string][]string
-	Error     error
+	ReqBody        *bytes.Buffer
+	ResBody        *bytes.Buffer
+	TargetRequest  *http.Request
+	TargetResponse *http.Response
+	Error          error
 }
 
 type HttpProxy struct {
@@ -33,29 +33,28 @@ func NewHttpProxy(protocol, host, port string, preventHostReplace bool, w http.R
 }
 
 func (p *HttpProxy) Redirect() {
-	res, err := p.upStreamRequest()
+	res, err := p.proxyRequest()
 	if err != nil {
 		p.processData.Error = err
-		http.Error(p.ResponseWriter, "Error up streaming response", http.StatusInternalServerError)
+		http.Error(p.ResponseWriter, "Error while proxying the request", http.StatusInternalServerError)
 		return
 	}
 	defer res.Body.Close()
 
-	err = p.downStreamResponse(res)
+	err = p.proxyResponse(res)
 	if err != nil {
 		p.processData.Error = err
-		http.Error(p.ResponseWriter, "Error down streaming response", http.StatusInternalServerError)
+		http.Error(p.ResponseWriter, "Error while proxying the response", http.StatusInternalServerError)
 		return
 	}
 }
 
-func (p *HttpProxy) downStreamResponse(res *http.Response) error {
+func (p *HttpProxy) proxyResponse(res *http.Response) error {
 	for header, values := range res.Header {
 		for _, value := range values {
 			p.ResponseWriter.Header().Add(header, value)
 		}
 	}
-	p.processData.ResHeader = p.ResponseWriter.Header()
 
 	p.ResponseWriter.WriteHeader(res.StatusCode)
 
@@ -68,7 +67,7 @@ func (p *HttpProxy) downStreamResponse(res *http.Response) error {
 	return nil
 }
 
-func (p *HttpProxy) upStreamRequest() (*http.Response, error) {
+func (p *HttpProxy) proxyRequest() (*http.Response, error) {
 	remoteUrl := p.GetRemoteUrl()
 
 	client := &http.Client{}
@@ -77,6 +76,7 @@ func (p *HttpProxy) upStreamRequest() (*http.Response, error) {
 	p.processData.ReqBody = reqBody
 
 	req, err := http.NewRequest(p.Request.Method, remoteUrl, teeReq)
+	p.processData.TargetRequest = req
 	if err != nil {
 		return nil, err
 	}
@@ -88,9 +88,9 @@ func (p *HttpProxy) upStreamRequest() (*http.Response, error) {
 			req.Header.Add(header, value)
 		}
 	}
-	p.processData.ReqHeader = p.Request.Header
 
 	res, err := client.Do(req)
+	p.processData.TargetResponse = res
 	if err != nil {
 		return nil, err
 	}
