@@ -5,7 +5,15 @@ import (
 	"io"
 	"net/http"
 	"strings"
+
+	"moul.io/http2curl"
 )
+
+type ReadCloser struct{ *bytes.Buffer }
+
+func (r ReadCloser) Close() error {
+	return nil
+}
 
 type HttpData struct {
 	ReqBody        *bytes.Buffer
@@ -13,6 +21,63 @@ type HttpData struct {
 	TargetRequest  *http.Request
 	TargetResponse *http.Response
 	Error          error
+}
+
+func (d *HttpData) ReqProtocol() string {
+	return d.TargetRequest.Proto
+}
+
+func (d *HttpData) ResProtocol() string {
+	return d.TargetResponse.Proto
+}
+
+func (d *HttpData) Method() string {
+	return d.TargetRequest.Method
+}
+
+func (d *HttpData) Host() string {
+	return d.TargetRequest.Host
+}
+
+func (d *HttpData) StatusCode() (int, string) {
+	statusCode := d.TargetResponse.StatusCode
+	return statusCode, http.StatusText(statusCode)
+}
+
+func (d *HttpData) ReqHeader() map[string][]string {
+	return d.TargetRequest.Header
+}
+
+func (d *HttpData) ResHeader() map[string][]string {
+	return d.TargetResponse.Header
+}
+
+func (d *HttpData) CURL() (string, error) {
+	readCloser := ReadCloser{d.ReqBody}
+	d.TargetRequest.Body = readCloser
+
+	command, err := http2curl.GetCurlCommand(d.TargetRequest)
+	if err != nil {
+		return "", err
+	}
+	return command.String(), nil
+}
+
+func (d *HttpData) ReqBodyStr() string {
+	return d.ReqBody.String()
+}
+
+func (d *HttpData) ResBodyStr() string {
+	return d.ResBody.String()
+}
+
+// TODO: complete this function
+func (d *HttpData) Path() string {
+	return ""
+}
+
+func (d *HttpData) GetError() error {
+	return d.Error
 }
 
 type HttpProxy struct {
