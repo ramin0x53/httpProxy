@@ -28,7 +28,7 @@ func httpTerminalPrint(log *httpLog) {
 
 	if log.err != nil {
 		color.Red("Error:")
-		color.Red(log.curl)
+		color.Red(log.err.Error())
 		fmt.Printf("\n\n")
 	}
 }

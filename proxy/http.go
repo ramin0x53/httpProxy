@@ -25,35 +25,67 @@ type HttpData struct {
 }
 
 func (d *HttpData) ReqProtocol() string {
+	if d.TargetRequest == nil {
+		return ""
+	}
+
 	return d.TargetRequest.Proto
 }
 
 func (d *HttpData) ResProtocol() string {
+	if d.TargetResponse == nil {
+		return ""
+	}
+
 	return d.TargetResponse.Proto
 }
 
 func (d *HttpData) Method() string {
+	if d.TargetRequest == nil {
+		return ""
+	}
+
 	return d.TargetRequest.Method
 }
 
 func (d *HttpData) Host() string {
+	if d.TargetRequest == nil {
+		return ""
+	}
+
 	return d.TargetRequest.Host
 }
 
 func (d *HttpData) StatusCode() (int, string) {
+	if d.TargetResponse == nil {
+		return 0, ""
+	}
+
 	statusCode := d.TargetResponse.StatusCode
 	return statusCode, http.StatusText(statusCode)
 }
 
 func (d *HttpData) ReqHeader() map[string][]string {
+	if d.TargetRequest == nil {
+		return nil
+	}
+
 	return d.TargetRequest.Header
 }
 
 func (d *HttpData) ResHeader() map[string][]string {
+	if d.TargetResponse == nil {
+		return nil
+	}
+
 	return d.TargetResponse.Header
 }
 
 func (d *HttpData) CURL() (string, error) {
+	if d.TargetRequest == nil {
+		return "", nil
+	}
+
 	readCloser := ReadCloser{d.ReqBody}
 	d.TargetRequest.Body = readCloser
 
@@ -65,6 +97,10 @@ func (d *HttpData) CURL() (string, error) {
 }
 
 func (d *HttpData) ReqBodyStr() string {
+	if d.ReqBody == nil {
+		return ""
+	}
+
 	if values, exists := d.ReqHeader()["Content-Encoding"]; exists {
 		body, err := utility.DecodeContent(strings.Trim(values[0], " "), d.ReqBody)
 		if err != nil {
@@ -77,6 +113,10 @@ func (d *HttpData) ReqBodyStr() string {
 }
 
 func (d *HttpData) ResBodyStr() string {
+	if d.ResBody == nil {
+		return ""
+	}
+
 	if values, exists := d.ResHeader()["Content-Encoding"]; exists {
 		body, err := utility.DecodeContent(strings.Trim(values[0], " "), d.ResBody)
 		if err != nil {
@@ -89,6 +129,10 @@ func (d *HttpData) ResBodyStr() string {
 }
 
 func (d *HttpData) Path() string {
+	if d.TargetRequest == nil {
+		return ""
+	}
+
 	path := d.TargetRequest.URL.Path
 	if d.TargetRequest.URL.RawQuery != "" {
 		path = path + "?" + d.TargetRequest.URL.RawQuery
@@ -195,7 +239,7 @@ func (p *HttpProxy) changeReqHost(host string) string {
 			outputPort = strings.Split(host, ":")[1]
 		}
 
-		return inputHost + outputPort
+		return inputHost + ":" + outputPort
 	} else {
 		return host
 	}
