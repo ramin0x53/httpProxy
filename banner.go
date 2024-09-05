@@ -8,7 +8,7 @@ import (
 )
 
 func showBanner(listenAddr string) {
-	templ := fmt.Sprintf(`{{ .AnsiColor.BrightBlue }}{{ .Title "httpProxy" "" 8 }}
+	templ := fmt.Sprintf(`{{ .AnsiColor.BrightGreen }}{{ .Title "httpProxy" "" 8 }}
    {{ .AnsiColor.BrightCyan }}Author: {{ .AnsiColor.Yellow }}Ramin Sardari{{ .AnsiColor.Default }}
    {{ .AnsiColor.BrightCyan }}ListenAddr: {{ .AnsiColor.Yellow }}%s{{ .AnsiColor.Default }}
    {{ .AnsiColor.BrightCyan }}NumCPU: {{ .AnsiColor.Yellow }}{{ .NumCPU }}{{ .AnsiColor.Default }}

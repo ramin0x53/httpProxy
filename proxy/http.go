@@ -63,17 +63,22 @@ func (d *HttpData) CURL() (string, error) {
 	return command.String(), nil
 }
 
+// TODO: decode encoded request
 func (d *HttpData) ReqBodyStr() string {
 	return d.ReqBody.String()
 }
 
+// TODO: decode encoded response
 func (d *HttpData) ResBodyStr() string {
 	return d.ResBody.String()
 }
 
-// TODO: complete this function
 func (d *HttpData) Path() string {
-	return ""
+	path := d.TargetRequest.URL.Path
+	if d.TargetRequest.URL.RawQuery != "" {
+		path = path + "?" + d.TargetRequest.URL.RawQuery
+	}
+	return path
 }
 
 func (d *HttpData) GetError() error {
@@ -90,10 +95,8 @@ type HttpProxy struct {
 	processData        *HttpData
 }
 
-// TODO: check for query string implementation
-
 func NewHttpProxy(protocol, host, port string, preventHostReplace bool, w http.ResponseWriter, r *http.Request) *HttpProxy {
-	proxy := &HttpProxy{Protocol: protocol, Host: host, Port: port, PreventHostReplace: preventHostReplace, Request: r, ResponseWriter: w}
+	proxy := &HttpProxy{Protocol: protocol, Host: host, Port: port, PreventHostReplace: preventHostReplace, Request: r, ResponseWriter: w, processData: &HttpData{}}
 	return proxy
 }
 
@@ -185,6 +188,9 @@ func (p *HttpProxy) changeReqHost(host string) string {
 
 func (p *HttpProxy) GetRemoteUrl() string {
 	url := p.Protocol + "://" + p.Host + ":" + p.Port + p.Request.URL.Path
+	if p.Request.URL.RawQuery != "" {
+		url = url + "?" + p.Request.URL.RawQuery
+	}
 	return url
 }
 

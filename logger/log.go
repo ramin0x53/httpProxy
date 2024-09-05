@@ -57,7 +57,7 @@ func (l *Logger) logWorker() {
 func (l *Logger) LogHttpRequest(data HttpInfo) {
 	statusCode, statusTxt := data.StatusCode()
 
-	log := &httpLog{reqProtocol: data.ReqProtocol(), resProtocol: data.ResProtocol(), method: data.Method(), host: data.Host(), statusCode: statusCode, StatusText: statusTxt, reqHeader: data.ReqHeader(), resHeader: data.ResHeader(), path: data.Path(), err: data.GetError()}
+	log := &httpLog{reqProtocol: data.ReqProtocol(), resProtocol: data.ResProtocol(), method: data.Method(), host: data.Host(), statusCode: statusCode, StatusText: statusTxt, reqHeader: data.ReqHeader(), resHeader: data.ResHeader(), path: data.Path(), err: data.GetError(), reqBodyStr: data.ReqBodyStr(), resBodyStr: data.ResBodyStr()}
 
 	if l.Config.Curl {
 		var err error
