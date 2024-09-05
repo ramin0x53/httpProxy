@@ -2,6 +2,7 @@ package proxy
 
 import (
 	"bytes"
+	"errors"
 	"httpProxy/utility"
 	"io"
 	"net/http"
@@ -195,6 +196,10 @@ func (p *HttpProxy) proxyResponse(res *http.Response) error {
 }
 
 func (p *HttpProxy) proxyRequest() (*http.Response, error) {
+	if p.Host == "" {
+		return p.handleEmptyHost()
+	}
+
 	remoteUrl := p.GetRemoteUrl()
 
 	client := &http.Client{}
@@ -243,6 +248,20 @@ func (p *HttpProxy) changeReqHost(host string) string {
 	} else {
 		return host
 	}
+}
+
+func (p *HttpProxy) handleEmptyHost() (*http.Response, error) {
+	var buffer bytes.Buffer
+	_, err := io.Copy(&buffer, p.Request.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	p.processData.ReqBody = &buffer
+	p.Request.URL.Host = p.Request.Host
+	p.Request.URL.Scheme = "http"
+	p.processData.TargetRequest = p.Request
+	return nil, errors.New("Host is empty")
 }
 
 func (p *HttpProxy) GetRemoteUrl() string {
