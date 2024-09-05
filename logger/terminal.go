@@ -2,6 +2,7 @@ package logger
 
 import (
 	"fmt"
+	"httpProxy/utility"
 	"time"
 
 	"github.com/fatih/color"
@@ -33,21 +34,11 @@ func httpTerminalPrint(log *httpLog) {
 }
 
 func makeHttpResponseLog(statusCode int, statusTxt, protocol, body string, header map[string][]string) string {
-	headerStr := headerToString(header)
+	headerStr := utility.HeaderToString(header)
 	return fmt.Sprintf("%s %d %s\n%s\n%s", protocol, statusCode, statusTxt, headerStr, body)
 }
 
 func makeHttpRequestLog(method, path, protocol, host, body string, header map[string][]string) string {
-	headerStr := headerToString(header)
+	headerStr := utility.HeaderToString(header)
 	return fmt.Sprintf("%s %s %s\nHost: %s\n%s\n%s", method, path, protocol, host, headerStr, body)
-}
-
-func headerToString(header map[string][]string) string {
-	txt := ""
-	for key, values := range header {
-		for _, value := range values {
-			txt = txt + key + ": " + value + "\n"
-		}
-	}
-	return txt
 }

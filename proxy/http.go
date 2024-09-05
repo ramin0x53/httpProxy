@@ -2,6 +2,7 @@ package proxy
 
 import (
 	"bytes"
+	"httpProxy/utility"
 	"io"
 	"net/http"
 	"strings"
@@ -63,13 +64,27 @@ func (d *HttpData) CURL() (string, error) {
 	return command.String(), nil
 }
 
-// TODO: decode encoded request
 func (d *HttpData) ReqBodyStr() string {
+	if values, exists := d.ReqHeader()["Content-Encoding"]; exists {
+		body, err := utility.DecodeContent(strings.Trim(values[0], " "), d.ReqBody)
+		if err != nil {
+			return err.Error()
+		}
+		return string(*body)
+	}
+
 	return d.ReqBody.String()
 }
 
-// TODO: decode encoded response
 func (d *HttpData) ResBodyStr() string {
+	if values, exists := d.ResHeader()["Content-Encoding"]; exists {
+		body, err := utility.DecodeContent(strings.Trim(values[0], " "), d.ResBody)
+		if err != nil {
+			return err.Error()
+		}
+		return string(*body)
+	}
+
 	return d.ResBody.String()
 }
 
