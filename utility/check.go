@@ -2,10 +2,13 @@ package utility
 
 import "strings"
 
-func IncludeCheck(txt, subStr string) bool {
-	return subStr != "" && strings.Contains(txt, subStr)
+// Returns include check and exist
+func IncludeCheck(txt, subStr string) (bool, bool) {
+	return strings.Contains(txt, subStr), subStr != ""
 }
 
-func ExcludeCheck(txt, subStr string) bool {
-	return !IncludeCheck(txt, subStr)
+// Returns exclude check and exist
+func ExcludeCheck(txt, subStr string) (bool, bool) {
+	checkResult, exist := IncludeCheck(txt, subStr)
+	return !checkResult, exist
 }

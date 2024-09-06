@@ -73,21 +73,21 @@ func (l *Logger) LogHttpRequest(data HttpInfo) {
 }
 
 func (l *Logger) filter(log *httpLog) {
-	if !utility.IncludeCheck(log.reqBodyStr, l.Config.ReqBodyInclude) {
+	if checkRes, exist := utility.IncludeCheck(log.reqBodyStr, l.Config.ReqBodyInclude); exist && !checkRes {
 		return
 	}
 
-	if !utility.IncludeCheck(log.path, l.Config.PathInclude) {
+	if checkRes, exist := utility.IncludeCheck(log.path, l.Config.PathInclude); exist && !checkRes {
 		return
 	}
 
-	if !utility.IncludeCheck(log.resBodyStr, l.Config.ResBodyInclude) {
+	if checkRes, exist := utility.IncludeCheck(log.resBodyStr, l.Config.ResBodyInclude); exist && !checkRes {
 		return
 	}
 
 	for key, value := range l.Config.ReqHeaderInclude {
 		for _, headerValue := range log.reqHeader[key] {
-			if !utility.IncludeCheck(headerValue, value) {
+			if checkRes, exist := utility.IncludeCheck(headerValue, value); exist && !checkRes {
 				return
 			}
 		}
@@ -95,27 +95,27 @@ func (l *Logger) filter(log *httpLog) {
 
 	for key, value := range l.Config.ResHeaderInclude {
 		for _, headerValue := range log.resHeader[key] {
-			if !utility.IncludeCheck(headerValue, value) {
+			if checkRes, exist := utility.IncludeCheck(headerValue, value); exist && !checkRes {
 				return
 			}
 		}
 	}
 
-	if !utility.ExcludeCheck(log.reqBodyStr, l.Config.ReqBodyExclude) {
+	if checkRes, exist := utility.ExcludeCheck(log.reqBodyStr, l.Config.ReqBodyExclude); exist && !checkRes {
 		return
 	}
 
-	if !utility.ExcludeCheck(log.path, l.Config.PathExclude) {
+	if checkRes, exist := utility.ExcludeCheck(log.path, l.Config.PathExclude); exist && !checkRes {
 		return
 	}
 
-	if !utility.ExcludeCheck(log.resBodyStr, l.Config.ResBodyExclude) {
+	if checkRes, exist := utility.ExcludeCheck(log.resBodyStr, l.Config.ResBodyExclude); exist && !checkRes {
 		return
 	}
 
 	for key, value := range l.Config.ReqHeaderExclude {
 		for _, headerValue := range log.reqHeader[key] {
-			if !utility.ExcludeCheck(headerValue, value) {
+			if checkRes, exist := utility.ExcludeCheck(headerValue, value); exist && !checkRes {
 				return
 			}
 		}
@@ -123,7 +123,7 @@ func (l *Logger) filter(log *httpLog) {
 
 	for key, value := range l.Config.ResHeaderExclude {
 		for _, headerValue := range log.resHeader[key] {
-			if !utility.ExcludeCheck(headerValue, value) {
+			if checkRes, exist := utility.ExcludeCheck(headerValue, value); exist && !checkRes {
 				return
 			}
 		}
