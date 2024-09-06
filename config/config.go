@@ -46,6 +46,8 @@ func NewConfig() *Config {
 
 func (c *Config) get() {
 	listenAddr := flag.String("l", "0.0.0.0:8080", "Listen address (default: 0.0.0.0:8080)")
+	certPath := flag.String("cert", "", "Cert path")
+	keyPath := flag.String("key", "", "Key path")
 	proxyAddr := flag.String("p", "", "Proxy address (e.g. https://example.com:3000)")
 	preventHostReplace := flag.Bool("r", false, "Prevent to replace Host header (default: false)")
 	curlEnable := flag.Bool("c", false, "Show request curl (default: false)")
@@ -83,6 +85,8 @@ func (c *Config) get() {
 	c.Logger.ResHeaderExclude = resHeaderExclude
 
 	c.Server.ListenAddr = *listenAddr
+	c.Server.CertPath = *certPath
+	c.Server.KeyPath = *keyPath
 
 	pAddr, err := url.Parse(*proxyAddr)
 	if err != nil {
