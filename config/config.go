@@ -58,6 +58,15 @@ func (c *Config) get() {
 	flag.Var(&reqHeaderInclude, "frqhi", "Filter request header that contains following string (e.g. Referrer=test.com)")
 	flag.Var(&resHeaderInclude, "frshi", "Filter response header that contains following string (e.g. Origin=test.com)")
 
+	pathExclude := flag.String("fpe", "", "Filter paths that not contains following string")
+	reqBodyExclude := flag.String("frqbe", "", "Filter request bodies that not contains following string")
+	resBodyExclude := flag.String("frsbe", "", "Filter response bodies that not contains following string")
+
+	var reqHeaderExclude keyValueFlag = make(map[string]string)
+	var resHeaderExclude keyValueFlag = make(map[string]string)
+	flag.Var(&reqHeaderExclude, "frqhe", "Filter request header that not contains following string (e.g. Referrer=test.com)")
+	flag.Var(&resHeaderExclude, "frshe", "Filter response header that not contains following string (e.g. Origin=test.com)")
+
 	flag.Parse()
 
 	c.Logger.Curl = *curlEnable
@@ -66,6 +75,12 @@ func (c *Config) get() {
 	c.Logger.ReqBodyInclude = *reqBodyInclude
 	c.Logger.ReqHeaderInclude = reqHeaderInclude
 	c.Logger.ResHeaderInclude = resHeaderInclude
+
+	c.Logger.PathExclude = *pathExclude
+	c.Logger.ResBodyExclude = *resBodyExclude
+	c.Logger.ReqBodyExclude = *reqBodyExclude
+	c.Logger.ReqHeaderExclude = reqHeaderExclude
+	c.Logger.ResHeaderExclude = resHeaderExclude
 
 	c.Server.ListenAddr = *listenAddr
 

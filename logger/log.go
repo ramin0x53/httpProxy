@@ -2,7 +2,7 @@ package logger
 
 import (
 	"httpProxy/config"
-	"strings"
+	"httpProxy/utility"
 )
 
 type httpLog struct {
@@ -73,21 +73,21 @@ func (l *Logger) LogHttpRequest(data HttpInfo) {
 }
 
 func (l *Logger) filter(log *httpLog) {
-	if l.Config.ReqBodyInclude != "" && !strings.Contains(log.reqBodyStr, l.Config.ReqBodyInclude) {
+	if !utility.IncludeCheck(log.reqBodyStr, l.Config.ReqBodyInclude) {
 		return
 	}
 
-	if l.Config.PathInclude != "" && !strings.Contains(log.path, l.Config.PathInclude) {
+	if !utility.IncludeCheck(log.path, l.Config.PathInclude) {
 		return
 	}
 
-	if l.Config.ResBodyInclude != "" && !strings.Contains(log.resBodyStr, l.Config.ResBodyInclude) {
+	if !utility.IncludeCheck(log.resBodyStr, l.Config.ResBodyInclude) {
 		return
 	}
 
 	for key, value := range l.Config.ReqHeaderInclude {
 		for _, headerValue := range log.reqHeader[key] {
-			if value != "" && !strings.Contains(headerValue, value) {
+			if !utility.IncludeCheck(headerValue, value) {
 				return
 			}
 		}
@@ -95,7 +95,35 @@ func (l *Logger) filter(log *httpLog) {
 
 	for key, value := range l.Config.ResHeaderInclude {
 		for _, headerValue := range log.resHeader[key] {
-			if value != "" && !strings.Contains(headerValue, value) {
+			if !utility.IncludeCheck(headerValue, value) {
+				return
+			}
+		}
+	}
+
+	if !utility.ExcludeCheck(log.reqBodyStr, l.Config.ReqBodyExclude) {
+		return
+	}
+
+	if !utility.ExcludeCheck(log.path, l.Config.PathExclude) {
+		return
+	}
+
+	if !utility.ExcludeCheck(log.resBodyStr, l.Config.ResBodyExclude) {
+		return
+	}
+
+	for key, value := range l.Config.ReqHeaderExclude {
+		for _, headerValue := range log.reqHeader[key] {
+			if !utility.ExcludeCheck(headerValue, value) {
+				return
+			}
+		}
+	}
+
+	for key, value := range l.Config.ResHeaderExclude {
+		for _, headerValue := range log.resHeader[key] {
+			if !utility.ExcludeCheck(headerValue, value) {
 				return
 			}
 		}
