@@ -133,5 +133,13 @@ func (l *Logger) filter(log *httpLog) {
 		}
 	}
 
+	if l.Config.StatusCodeInclude != 0 && log.statusCode != l.Config.StatusCodeInclude {
+		return
+	}
+
+	if l.Config.StatusCodeExclude != 0 && log.statusCode == l.Config.StatusCodeExclude {
+		return
+	}
+
 	l.queue <- log
 }

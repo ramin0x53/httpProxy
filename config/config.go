@@ -55,6 +55,9 @@ func (c *Config) get() {
 	reqBodyInclude := flag.String("frqbi", "", "Filter request bodies that contains following string")
 	resBodyInclude := flag.String("frsbi", "", "Filter response bodies that contains following string")
 
+	statuCodeInclude := flag.Int("fsi", 0, "Filter status code that contains following number")
+	statuCodeExclude := flag.Int("fse", 0, "Filter status code that not contains following number")
+
 	var reqHeaderInclude keyValueFlag = make(map[string]string)
 	var resHeaderInclude keyValueFlag = make(map[string]string)
 	flag.Var(&reqHeaderInclude, "frqhi", "Filter request header that contains following string (e.g. Referrer=test.com)")
@@ -87,6 +90,9 @@ func (c *Config) get() {
 	c.Server.ListenAddr = *listenAddr
 	c.Server.CertPath = *certPath
 	c.Server.KeyPath = *keyPath
+
+	c.Logger.StatusCodeInclude = *statuCodeInclude
+	c.Logger.StatusCodeExclude = *statuCodeExclude
 
 	pAddr, err := url.Parse(*proxyAddr)
 	if err != nil {
