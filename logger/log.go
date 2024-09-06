@@ -86,6 +86,7 @@ func (l *Logger) filter(log *httpLog) {
 	}
 
 	for key, value := range l.Config.ReqHeaderInclude {
+		key = utility.CapitalizeFirstLetter(key)
 		for _, headerValue := range log.reqHeader[key] {
 			if checkRes, exist := utility.IncludeCheck(headerValue, value); exist && !checkRes {
 				return
@@ -94,6 +95,7 @@ func (l *Logger) filter(log *httpLog) {
 	}
 
 	for key, value := range l.Config.ResHeaderInclude {
+		key = utility.CapitalizeFirstLetter(key)
 		for _, headerValue := range log.resHeader[key] {
 			if checkRes, exist := utility.IncludeCheck(headerValue, value); exist && !checkRes {
 				return
@@ -114,6 +116,7 @@ func (l *Logger) filter(log *httpLog) {
 	}
 
 	for key, value := range l.Config.ReqHeaderExclude {
+		key = utility.CapitalizeFirstLetter(key)
 		for _, headerValue := range log.reqHeader[key] {
 			if checkRes, exist := utility.ExcludeCheck(headerValue, value); exist && !checkRes {
 				return
@@ -122,6 +125,7 @@ func (l *Logger) filter(log *httpLog) {
 	}
 
 	for key, value := range l.Config.ResHeaderExclude {
+		key = utility.CapitalizeFirstLetter(key)
 		for _, headerValue := range log.resHeader[key] {
 			if checkRes, exist := utility.ExcludeCheck(headerValue, value); exist && !checkRes {
 				return
